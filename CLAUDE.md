@@ -8,6 +8,10 @@ It exists because `io.flutter` does not reliably find the SDK of an FVM project.
 instead was rejected: the fork bundles JxBrowser jars whose TeamDev licence is not transferable, the
 plugin id `io.flutter` is taken, and the vendor is Google.
 
+The general conventions that apply to every change in this repository:
+
+@.claude/general-conventions.md
+
 ## Build
 
 ```
