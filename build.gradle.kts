@@ -26,6 +26,9 @@ dependencies {
 }
 
 intellijPlatform {
+  publishing {
+    token = providers.environmentVariable("JETBRAINS_MARKETPLACE_UPLOAD_TOKEN")
+  }
   pluginConfiguration {
     ideaVersion {
       sinceBuild = providers.gradleProperty("sinceBuild")
