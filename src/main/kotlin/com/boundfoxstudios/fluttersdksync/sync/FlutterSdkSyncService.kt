@@ -1,4 +1,4 @@
-package de.boundfoxstudios.fluttersdksync.sync
+package com.boundfoxstudios.fluttersdksync.sync
 
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -6,11 +6,11 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.AsyncFileListener
 import com.intellij.openapi.vfs.VirtualFileManager
-import de.boundfoxstudios.fluttersdksync.apply.FlutterSdkApplier
-import de.boundfoxstudios.fluttersdksync.discovery.VersionManagerSdkLocator
-import de.boundfoxstudios.fluttersdksync.settings.FlutterSdkSyncSettings
-import de.boundfoxstudios.fluttersdksync.watch.DebouncedTrigger
-import de.boundfoxstudios.fluttersdksync.watch.FvmWatchScope
+import com.boundfoxstudios.fluttersdksync.apply.FlutterSdkApplier
+import com.boundfoxstudios.fluttersdksync.discovery.VersionManagerSdkLocator
+import com.boundfoxstudios.fluttersdksync.settings.FlutterSdkSyncSettings
+import com.boundfoxstudios.fluttersdksync.watch.DebouncedTrigger
+import com.boundfoxstudios.fluttersdksync.watch.FvmWatchScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.sync.Mutex

@@ -1,4 +1,4 @@
-package de.boundfoxstudios.fluttersdksync.discovery
+package com.boundfoxstudios.fluttersdksync.discovery
 
 import java.io.IOException
 import java.nio.file.Files

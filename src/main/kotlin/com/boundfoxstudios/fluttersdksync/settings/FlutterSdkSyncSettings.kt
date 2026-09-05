@@ -1,4 +1,4 @@
-package de.boundfoxstudios.fluttersdksync.settings
+package com.boundfoxstudios.fluttersdksync.settings
 
 import com.intellij.openapi.components.SerializablePersistentStateComponent
 import com.intellij.openapi.components.Service

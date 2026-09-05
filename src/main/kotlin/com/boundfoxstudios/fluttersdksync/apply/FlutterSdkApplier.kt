@@ -1,4 +1,4 @@
-package de.boundfoxstudios.fluttersdksync.apply
+package com.boundfoxstudios.fluttersdksync.apply
 
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.diagnostic.Logger

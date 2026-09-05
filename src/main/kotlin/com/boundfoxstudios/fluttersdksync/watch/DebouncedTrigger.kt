@@ -1,4 +1,4 @@
-package de.boundfoxstudios.fluttersdksync.watch
+package com.boundfoxstudios.fluttersdksync.watch
 
 import com.intellij.openapi.diagnostic.Logger
 import kotlinx.coroutines.CancellationException

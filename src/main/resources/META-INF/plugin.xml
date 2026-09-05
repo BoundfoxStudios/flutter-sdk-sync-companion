@@ -1,5 +1,5 @@
 <idea-plugin>
-  <id>de.boundfoxstudios.flutter-sdk-sync-companion</id>
+  <id>com.boundfoxstudios.flutter-sdk-sync-companion</id>
   <name>Flutter SDK Sync Companion</name>
   <vendor url="https://boundfoxstudios.com">Boundfox Studios</vendor>
   <description><![CDATA[
@@ -14,13 +14,13 @@
   <depends>io.flutter</depends>
 
   <extensions defaultExtensionNs="com.intellij">
-    <postStartupActivity implementation="de.boundfoxstudios.fluttersdksync.startup.FlutterSdkSyncActivity"/>
+    <postStartupActivity implementation="com.boundfoxstudios.fluttersdksync.startup.FlutterSdkSyncActivity"/>
     <notificationGroup id="Flutter SDK Sync" displayType="BALLOON"/>
     <projectConfigurable
       parentId="language"
-      id="de.boundfoxstudios.flutter-sdk-sync-companion.settings"
+      id="com.boundfoxstudios.flutter-sdk-sync-companion.settings"
       displayName="Flutter SDK Sync"
       nonDefaultProject="true"
-      instance="de.boundfoxstudios.fluttersdksync.settings.FlutterSdkSyncConfigurable"/>
+      instance="com.boundfoxstudios.fluttersdksync.settings.FlutterSdkSyncConfigurable"/>
   </extensions>
 </idea-plugin>
