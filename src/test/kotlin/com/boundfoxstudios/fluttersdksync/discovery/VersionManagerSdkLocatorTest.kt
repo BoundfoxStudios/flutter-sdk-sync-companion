@@ -1,4 +1,4 @@
-package de.boundfoxstudios.fluttersdksync.discovery
+package com.boundfoxstudios.fluttersdksync.discovery
 
 import java.nio.file.Files
 import java.nio.file.Path

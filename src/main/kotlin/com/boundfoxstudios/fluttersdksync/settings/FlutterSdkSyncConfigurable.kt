@@ -1,4 +1,4 @@
-package de.boundfoxstudios.fluttersdksync.settings
+package com.boundfoxstudios.fluttersdksync.settings
 
 import com.intellij.openapi.options.BoundConfigurable
 import com.intellij.openapi.project.Project
@@ -8,7 +8,7 @@ import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.bindSelected
 import com.intellij.ui.dsl.builder.panel
 import com.intellij.ui.dsl.builder.selected
-import de.boundfoxstudios.fluttersdksync.sync.FlutterSdkSyncService
+import com.boundfoxstudios.fluttersdksync.sync.FlutterSdkSyncService
 
 // BoundConfigurable insists on a display name, but the settings tree renders the displayName of
 // the extension point, so renaming the page here alone changes nothing.

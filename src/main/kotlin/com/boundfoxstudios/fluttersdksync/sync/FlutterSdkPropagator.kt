@@ -1,4 +1,4 @@
-package de.boundfoxstudios.fluttersdksync.sync
+package com.boundfoxstudios.fluttersdksync.sync
 
 import com.intellij.openapi.application.EDT
 import com.intellij.openapi.application.readAction

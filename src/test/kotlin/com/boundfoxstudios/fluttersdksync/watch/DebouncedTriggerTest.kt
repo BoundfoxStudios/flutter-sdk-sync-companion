@@ -1,4 +1,4 @@
-package de.boundfoxstudios.fluttersdksync.watch
+package com.boundfoxstudios.fluttersdksync.watch
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
