@@ -1,4 +1,5 @@
 .intellijPlatform/
+.kotlin/
 .gradle/
 build/
 out/
