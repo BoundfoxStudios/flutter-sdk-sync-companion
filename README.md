@@ -1,8 +1,8 @@
 # Flutter SDK Sync Companion
 
 [![Build](https://img.shields.io/github/actions/workflow/status/BoundfoxStudios/flutter-sdk-sync-companion/build.yml?branch=main&label=build)](https://github.com/BoundfoxStudios/flutter-sdk-sync-companion/actions/workflows/build.yml)
-[![Version](https://img.shields.io/jetbrains/plugin/v/34116?label=marketplace)](https://plugins.jetbrains.com/plugin/34116-flutter-sdk-sync-companion)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/34116?label=downloads)](https://plugins.jetbrains.com/plugin/34116-flutter-sdk-sync-companion)
+[![Version](https://img.shields.io/jetbrains/plugin/v/34117?label=marketplace)](https://plugins.jetbrains.com/plugin/34117-flutter-sdk-sync-companion)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/34117?label=downloads)](https://plugins.jetbrains.com/plugin/34117-flutter-sdk-sync-companion)
 [![License](https://img.shields.io/github/license/BoundfoxStudios/flutter-sdk-sync-companion)](LICENSE)
 
 An IntelliJ Platform plugin that keeps a project's Flutter SDK selection in sync with the SDK that
@@ -35,7 +35,7 @@ so no `fvm` binary is invoked. Other version managers are not supported.
 
 **Settings → Plugins → Marketplace**, search for *Flutter SDK Sync Companion*, install, restart.
 The plugin page is at
-[plugins.jetbrains.com](https://plugins.jetbrains.com/plugin/34116-flutter-sdk-sync-companion).
+[plugins.jetbrains.com](https://plugins.jetbrains.com/plugin/34117-flutter-sdk-sync-companion).
 
 Alternatively, download the zip from the
 [latest release](https://github.com/BoundfoxStudios/flutter-sdk-sync-companion/releases/latest) and
