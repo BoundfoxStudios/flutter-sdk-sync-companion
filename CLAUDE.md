@@ -24,6 +24,25 @@ Target platform is IntelliJ 2025.3 (build 253). `sinceBuild = 253` is forced by 
 by Flutter. `untilBuild` is deliberately unset: the IntelliJ Platform Gradle Plugin has had no
 default since 2.6.0 and warns when one is set alongside `sinceBuild >= 243`.
 
+## Release
+
+Releases are cut by release-please from the Conventional Commit history. A push to `main` opens or
+updates a release pull request; merging it writes `CHANGELOG.md`, tags the release and attaches the
+built plugin zip.
+
+The version lives in exactly one place, `version = ...` in `build.gradle.kts`, annotated with
+`// x-release-please-version`. Never bump it by hand: `patchPluginXml` derives the plugin version and
+the zip name from it, and a manual bump would collide with the one release-please writes.
+
+`actionlint` reports `client-id` on `actions/create-github-app-token` as an unknown input and
+demands the deprecated `app-id`. Its bundled action database is stale: verified against the
+`action.yml` at tag v3.2.0, `client-id` is the current input and `app-id` carries a deprecation
+message. Do not "fix" that warning.
+
+`.release-please-manifest.json` stays `{}` until the first release is merged. An entry there counts
+as an already released version, and the first release would then be a bump off it rather than the
+1.0.0 that `initial-version` asks for.
+
 ## Architecture
 
 `FlutterSdkSyncActivity` (a `postStartupActivity`) does nothing but obtain `FlutterSdkSyncService`
