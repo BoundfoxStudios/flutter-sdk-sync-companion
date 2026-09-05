@@ -10,7 +10,7 @@ plugin id `io.flutter` is taken, and the vendor is Google.
 
 The general conventions that apply to every change in this repository:
 
-@.claude/general-conventions.md
+@general-conventions.md
 
 ## Build
 
@@ -27,8 +27,14 @@ default since 2.6.0 and warns when one is set alongside `sinceBuild >= 243`.
 ## Release
 
 Releases are cut by release-please from the Conventional Commit history. A push to `main` opens or
-updates a release pull request; merging it writes `CHANGELOG.md`, tags the release and attaches the
-built plugin zip.
+updates a release pull request; merging it writes `CHANGELOG.md`, tags the release, attaches the
+built plugin zip and uploads the same build to the JetBrains Marketplace via `publishPlugin`, which
+reads the repository secret `JETBRAINS_MARKETPLACE_UPLOAD_TOKEN`.
+
+The plugin is deliberately published unsigned. `signPlugin` runs automatically as soon as
+`privateKey` and `certificateChain` are configured, and adding them is all it takes to sign, but the
+Marketplace does not require it. `publishPlugin` fails when the version was already published, so a
+re-run of a release never silently overwrites anything.
 
 The version lives in exactly one place, `version = ...` in `build.gradle.kts`, annotated with
 `// x-release-please-version`. Never bump it by hand: `patchPluginXml` derives the plugin version and
