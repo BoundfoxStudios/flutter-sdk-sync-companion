@@ -18,7 +18,7 @@ The general conventions that apply to every change in this repository:
 JAVA_HOME=<jdk21> ./gradlew build buildPlugin verifyPluginProjectConfiguration
 ```
 
-`JAVA_HOME` is not optional when the default JDK is newer than 21 — the toolchain will not resolve.
+`JAVA_HOME` is not optional when the default JDK is newer than 21: the toolchain will not resolve.
 
 Target platform is IntelliJ 2025.3 (build 253). `sinceBuild = 253` is forced by the Dart plugin, not
 by Flutter. `untilBuild` is deliberately unset: the IntelliJ Platform Gradle Plugin has had no
@@ -51,7 +51,7 @@ project without a `.fvm` directory still notices a later `fvm use`.
 
 `FlutterSdkSyncService` (project-level service, injected `CoroutineScope`) owns everything: the
 `AsyncFileListener`, the debounced trigger, and the decision of what to do. Two of its three pieces
-of state live under a `Mutex` — the last *observed* resolved target, and whether a propagation is
+of state live under a `Mutex`: the last *observed* resolved target, and whether a propagation is
 still owed. They answer two different questions: the first detects a switch, the second survives a
 failed propagation so it is retried. Collapsing them into one nullable field makes a failed first
 propagation leave the watcher permanently deaf. The third, the forced-propagation request, is an
@@ -113,18 +113,18 @@ instance keeps the `home` of whichever project was opened first. Harmless while 
   (`restartServer()` also asserts read access, so it would need a `readAction {}`.)
 - `FlutterSdk.startPubGet` spawns the subprocess on the calling thread, and `io.flutter` calls it
   from the EDT. Use `flutterPackagesGet(root).startInModuleConsole(module, root::refresh, null)`
-  instead — off the EDT, with a completion hook.
+  instead, off the EDT, with a completion hook.
 - A forced `pub get` is required after a switch: `.dart_tool/package_config.json` holds absolute SDK
   paths while `PubRoot.hasUpToDatePackages` only compares pubspec timestamps.
 - `DeviceService.restart()`, not a refresh: `DeviceDaemon.Command` compares equal across the switch
   because the configured path string is unchanged, so a refresh is a no-op. Note that
   `DeviceService.getInstance(project)` starts the daemon if the service does not exist yet.
-- `FlutterSdk.getFlutterSdk` stats three files and reads a version file — never on the EDT.
+- `FlutterSdk.getFlutterSdk` stats three files and reads a version file, never on the EDT.
 - `PubRoot.getModule(project)` needs a read action.
 - VFS events are application-wide even when subscribed on a project message bus. Any path filter must
   be anchored on the project base path.
 - `AsyncFileListener` over `BulkFileListener` (the latter's own javadoc says so). Register with
-  `VirtualFileManager.getInstance().addAsyncFileListener(coroutineScope, listener)` — that overload
+  `VirtualFileManager.getInstance().addAsyncFileListener(coroutineScope, listener)`: that overload
   carries no deprecation and no `@ApiStatus.Experimental`, and the scope's completion unregisters it.
   `prepareChange` runs for every VFS batch in the whole IDE, so it must stay pure and cheap; side
   effects belong in `ChangeApplier.afterVfsChange()`, which runs on the EDT under the write lock and
@@ -134,7 +134,7 @@ instance keeps the `home` of whichever project was opened first. Harmless while 
   on event types, to cover both.
 - `Flow.debounce` is `@FlowPreview` in the coroutines fork bundled with the platform, hence the
   explicit `@OptIn`. The `Alarm` classes it replaces are `@Obsolete` in 253 and their own KDoc points
-  at a debounced flow. `kotlinx-coroutines-test` is not in the platform distribution — do not add it.
+  at a debounced flow. `kotlinx-coroutines-test` is not in the platform distribution, do not add it.
 - `io.flutter` declares no SDK-related extension points, carries no `@ApiStatus` annotations, and a
   minimum version for a plugin dependency cannot be declared (IDEABKL-7906). If a version gate ever
   becomes necessary, do it at runtime via `PluginManagerCore.getPlugin(...).getVersion()`, the way
@@ -144,8 +144,8 @@ instance keeps the `home` of whichever project was opened first. Harmless while 
 
 - Discovery is deliberately file-based, not `fvm`-binary-based: it works without fvm installed and
   assumes no CLI output format. Revisit only if Windows without Developer Mode (no symlinks) becomes
-  a requirement — it is explicitly out of scope.
-- `.fvmrc` is flat JSON, all fields optional, no published schema — tolerate unknown keys. The read
+  a requirement: it is explicitly out of scope.
+- `.fvmrc` is flat JSON, all fields optional, no published schema: tolerate unknown keys. The read
   key `flutterSdkVersion` takes precedence over `flutter`.
 - The legacy `.fvm/fvm_config.json` is rewritten on every `fvm use`, so its presence proves nothing.
 - `fvm api context` prints the entire process environment in clear text, tokens included. Never log
@@ -155,11 +155,11 @@ instance keeps the `home` of whichever project was opened first. Harmless while 
 
 Confirmed in Android Studio on macOS: an `fvm use` on an open project is picked up, the SDK is
 switched, the pub get console opens, and the Dart SDK version shown in the settings follows. So
-`.fvm` does sit inside a recursive watch root — no `addRootToWatch` is needed — the event shape the
+`.fvm` does sit inside a recursive watch root (no `addRootToWatch` is needed), the event shape the
 platform produces there is covered by the path-based matcher, and refreshing the four version files
 is enough to make the analysis server pick up the new version on its own.
 
-Everything else — the threading rules and the rest of the propagation chain — comes from the shipped
+Everything else (the threading rules and the rest of the propagation chain) comes from the shipped
 bytecode and sources rather than from an observed run. Unverified on Windows and Linux.
 
 The settings page itself is unverified. Nobody has opened it in a running IDE yet: neither the
