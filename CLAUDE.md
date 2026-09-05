@@ -115,9 +115,10 @@ instance keeps the `home` of whichever project was opened first. Harmless while 
 ## State of verification
 
 Confirmed in Android Studio on macOS: an `fvm use` on an open project is picked up, the SDK is
-switched and the pub get console opens. So `.fvm` does sit inside a recursive watch root — no
-`addRootToWatch` is needed — and the event shape the platform produces there is covered by the
-path-based matcher.
+switched, the pub get console opens, and the Dart SDK version shown in the settings follows. So
+`.fvm` does sit inside a recursive watch root — no `addRootToWatch` is needed — the event shape the
+platform produces there is covered by the path-based matcher, and refreshing the four version files
+is enough to make the analysis server pick up the new version on its own.
 
 Everything else — the threading rules and the rest of the propagation chain — comes from the shipped
 bytecode and sources rather than from an observed run. Unverified on Windows and Linux.
