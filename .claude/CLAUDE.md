@@ -10,7 +10,7 @@ plugin id `io.flutter` is taken, and the vendor is Google.
 
 The general conventions that apply to every change in this repository:
 
-@.claude/general-conventions.md
+@general-conventions.md
 
 ## Build
 
