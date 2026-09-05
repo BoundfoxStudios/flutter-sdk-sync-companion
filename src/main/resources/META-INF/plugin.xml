@@ -14,5 +14,11 @@
   <extensions defaultExtensionNs="com.intellij">
     <postStartupActivity implementation="de.boundfoxstudios.fluttersdksync.startup.FlutterSdkSyncActivity"/>
     <notificationGroup id="Flutter SDK Sync" displayType="BALLOON"/>
+    <projectConfigurable
+      parentId="language"
+      id="de.boundfoxstudios.flutter-sdk-sync-companion.settings"
+      displayName="Flutter SDK Sync"
+      nonDefaultProject="true"
+      instance="de.boundfoxstudios.fluttersdksync.settings.FlutterSdkSyncConfigurable"/>
   </extensions>
 </idea-plugin>

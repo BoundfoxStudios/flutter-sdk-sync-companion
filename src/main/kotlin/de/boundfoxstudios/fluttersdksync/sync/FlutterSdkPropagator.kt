@@ -17,31 +17,38 @@ import java.nio.file.Path
 
 class FlutterSdkPropagator {
 
-  suspend fun propagate(project: Project, sdkPath: Path) {
+  suspend fun propagate(project: Project, sdkPath: Path, runPubGet: Boolean): Boolean {
     // A synchronous VFS refresh must run neither on the EDT nor under a read lock, and
     // FlutterSdk.getFlutterSdk stats and reads SDK files, so both belong on a background thread.
+    // The lookup also guards the device restart below, so it stays outside the pub get branch,
+    // and finding no SDK means nothing was propagated and the caller has to retry.
     val flutterSdk = withContext(Dispatchers.IO) {
       refreshSdkFiles(sdkPath)
       FlutterSdk.getFlutterSdk(project)
-    } ?: return
+    } ?: return false
 
-    val modulesByPubRoot = readAction { collectModulesByPubRoot(project) }
+    if (runPubGet) {
+      val modulesByPubRoot = readAction { collectModulesByPubRoot(project) }
 
-    withContext(Dispatchers.EDT) {
-      FileDocumentManager.getInstance().saveAllDocuments()
-    }
+      // The pub get below is the only consumer, and this saves every unsaved document in the
+      // whole IDE.
+      withContext(Dispatchers.EDT) {
+        FileDocumentManager.getInstance().saveAllDocuments()
+      }
 
-    // .dart_tool/package_config.json holds absolute SDK paths, and PubRoot.hasUpToDatePackages
-    // only compares pubspec timestamps, so the pub get has to be forced.
-    withContext(Dispatchers.IO) {
-      modulesByPubRoot.forEach { (pubRoot, module) ->
-        flutterSdk.flutterPackagesGet(pubRoot).startInModuleConsole(module, pubRoot::refresh, null)
+      // .dart_tool/package_config.json holds absolute SDK paths, and PubRoot.hasUpToDatePackages
+      // only compares pubspec timestamps, so the pub get has to be forced.
+      withContext(Dispatchers.IO) {
+        modulesByPubRoot.forEach { (pubRoot, module) ->
+          flutterSdk.flutterPackagesGet(pubRoot).startInModuleConsole(module, pubRoot::refresh, null)
+        }
       }
     }
 
     // A plain refresh would be a no-op: the daemon command compares equal because the configured
     // SDK path string is unchanged across an "fvm use".
     DeviceService.getInstance(project).restart()
+    return true
   }
 
   private fun refreshSdkFiles(sdkPath: Path) {

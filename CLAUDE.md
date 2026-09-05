@@ -27,11 +27,27 @@ and await one synchronization. Creating the service is what registers the file l
 project without a `.fvm` directory still notices a later `fvm use`.
 
 `FlutterSdkSyncService` (project-level service, injected `CoroutineScope`) owns everything: the
-`AsyncFileListener`, the debounced trigger, and the decision of what to do. It holds two pieces of
-state under a `Mutex` — the last *observed* resolved target, and whether a propagation is still owed.
-They answer two different questions: the first detects a switch, the second survives a failed
-propagation so it is retried. Collapsing them into one nullable field makes a failed first
-propagation leave the watcher permanently deaf.
+`AsyncFileListener`, the debounced trigger, and the decision of what to do. Two of its three pieces
+of state live under a `Mutex` — the last *observed* resolved target, and whether a propagation is
+still owed. They answer two different questions: the first detects a switch, the second survives a
+failed propagation so it is retried. Collapsing them into one nullable field makes a failed first
+propagation leave the watcher permanently deaf. The third, the forced-propagation request, is an
+`AtomicBoolean` outside the `Mutex` on purpose: the settings page sets it from the EDT, where a
+suspending lock cannot be taken, and the service scope consumes it.
+
+`FlutterSdkSyncSettings` keeps the two working-mode switches (keep in sync, run pub get) in the
+workspace file rather than in a file of its own: they are personal switches, not a team contract, and
+`$WORKSPACE_FILE$` is the only project storage the platform itself marks VCS-ignored. The master
+switch is an early return at the top of `synchronize()`, never a condition on the listener
+registration: the startup activity is a second entry point, and the scope-bound
+`addAsyncFileListener` has no unregister handle. While the switch is off, `synchronize()` must not
+touch `lastObservedTarget` or `propagationOwed`: the first is what still recognizes a switch made
+while sync was off, the second is an obligation that turning sync off does not discharge. A service
+created while the switch was off has observed no target at all, and the configured path string never
+changes, so the settings page forces one propagation on the off to on transition, at the price of a
+redundant pub get when nothing actually changed. That propagation is dispatched while the settings
+dialog is still modal, and `Dispatchers.EDT` carries no modality state, so it only reaches the EDT
+once the dialog is closed: applying and leaving the dialog open defers the work, it does not lose it.
 
 `VersionManagerSdkLocator` stays free of IntelliJ imports so it is unit-testable without an IDE
 fixture. `FvmWatchScope` and `DebouncedTrigger` are pure for the same reason. Everything else is
@@ -123,5 +139,15 @@ is enough to make the analysis server pick up the new version on its own.
 Everything else — the threading rules and the rest of the propagation chain — comes from the shipped
 bytecode and sources rather than from an observed run. Unverified on Windows and Linux.
 
+The settings page itself is unverified. Nobody has opened it in a running IDE yet: neither the
+placement under Languages & Frameworks, nor that the workspace file really gains a
+`FlutterSdkSyncSettings` component in Android Studio, nor the forced propagation on the
+off to on transition.
+
 Accepted breakage on a switch, until the project is reopened: the DevTools server process of the old
 SDK and any already-open DevTools tool windows.
+
+With the pub get switched off, a version switch still refreshes the four version files and restarts
+the device service, so the displayed Dart SDK version and the analysis server follow it, but
+`.dart_tool/package_config.json` keeps the absolute paths of the previous SDK until a pub get is run
+by hand. Saving all documents is part of that skip: nothing but the pub get reads them.

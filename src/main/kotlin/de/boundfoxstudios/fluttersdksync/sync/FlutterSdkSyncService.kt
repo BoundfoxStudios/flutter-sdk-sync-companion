@@ -8,6 +8,7 @@ import com.intellij.openapi.vfs.AsyncFileListener
 import com.intellij.openapi.vfs.VirtualFileManager
 import de.boundfoxstudios.fluttersdksync.apply.FlutterSdkApplier
 import de.boundfoxstudios.fluttersdksync.discovery.VersionManagerSdkLocator
+import de.boundfoxstudios.fluttersdksync.settings.FlutterSdkSyncSettings
 import de.boundfoxstudios.fluttersdksync.watch.DebouncedTrigger
 import de.boundfoxstudios.fluttersdksync.watch.FvmWatchScope
 import kotlinx.coroutines.CoroutineScope
@@ -16,6 +17,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.nio.file.Path
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.milliseconds
 
 @Service(Service.Level.PROJECT)
@@ -31,6 +33,11 @@ class FlutterSdkSyncService(
   private val stateMutex = Mutex()
   private var lastObservedTarget: Path? = null
   private var propagationOwed = false
+  // Set from the EDT and consumed on the service scope, hence atomic instead of the Mutex.
+  private val propagationForced = AtomicBoolean(false)
+
+  private val settings: FlutterSdkSyncSettings
+    get() = FlutterSdkSyncSettings.getInstance(project)
 
   init {
     val projectBasePath = project.basePath
@@ -50,7 +57,18 @@ class FlutterSdkSyncService(
     }
   }
 
+  // A service created while synchronization was off has observed no target at all, and the
+  // configured path string is the same either way, so turning it on has to propagate blind.
+  fun requestForcedPropagation() {
+    propagationForced.set(true)
+    trigger.signal()
+  }
+
   suspend fun synchronize() {
+    // Checked before any state is touched: lastObservedTarget has to keep the target that was last
+    // propagated, so an "fvm use" made while synchronization was off still counts as a switch.
+    if (!settings.synchronizationEnabled) return
+
     val projectRoot = project.basePath?.let(Path::of) ?: return
     val sdkPath = withContext(Dispatchers.IO) { locator.locate(projectRoot) } ?: return
     val resolvedTarget = withContext(Dispatchers.IO) { locator.resolveTarget(sdkPath) } ?: return
@@ -65,14 +83,18 @@ class FlutterSdkSyncService(
       // must not run a pub get just because it was opened.
       val targetSwitched = previousTarget != null && previousTarget != resolvedTarget
       lastObservedTarget = resolvedTarget
-      if (configurationChanged || targetSwitched) {
+      // Consumed outside the condition: behind a short-circuiting || the request would survive
+      // into the next run and propagate a second time for nothing.
+      val forcedPropagation = propagationForced.getAndSet(false)
+      if (configurationChanged || targetSwitched || forcedPropagation) {
         propagationOwed = true
       }
       if (propagationOwed) {
-        LOG.info("Propagating Flutter SDK $resolvedTarget")
-        propagator.propagate(project, sdkPath)
-        // Cleared only after a successful propagation, so a failure is retried on the next signal.
-        propagationOwed = false
+        val runPubGet = settings.runPubGet
+        LOG.info("Propagating Flutter SDK $resolvedTarget (pub get: $runPubGet)")
+        // Stays owed when the propagation throws or when io.flutter resolves no SDK at that
+        // path, so the next signal retries it.
+        propagationOwed = !propagator.propagate(project, sdkPath, runPubGet)
       }
     }
   }
