@@ -1,5 +1,6 @@
 package de.boundfoxstudios.fluttersdksync.discovery
 
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -7,6 +8,13 @@ class VersionManagerSdkLocator {
 
   fun locate(projectRoot: Path): Path? =
     symlinkCandidates(projectRoot).firstOrNull { isFlutterSdkHome(it) }
+
+  fun resolveTarget(sdkPath: Path): Path? =
+    try {
+      sdkPath.toRealPath()
+    } catch (_: IOException) {
+      null
+    }
 
   private fun symlinkCandidates(projectRoot: Path): Sequence<Path> = sequence {
     val fvmDirectory = projectRoot.resolve(FVM_DIRECTORY)

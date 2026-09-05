@@ -62,6 +62,31 @@ class VersionManagerSdkLocatorTest {
     assertNull(locator.locate(projectRoot))
   }
 
+  @Test
+  fun resolveTarget_symlinkRepointedToAnotherVersion_returnsTheNewTarget() {
+    val firstSdkHome = createFlutterSdkHome("3.35.0")
+    val secondSdkHome = createFlutterSdkHome("3.38.0")
+    val symlink = projectRoot.resolve(".fvm/flutter_sdk")
+    symlink.parent.createDirectories()
+    Files.createSymbolicLink(symlink, firstSdkHome)
+    val firstTarget = locator.resolveTarget(symlink)
+
+    Files.delete(symlink)
+    Files.createSymbolicLink(symlink, secondSdkHome)
+
+    assertEquals(firstSdkHome.toRealPath(), firstTarget)
+    assertEquals(secondSdkHome.toRealPath(), locator.resolveTarget(symlink))
+  }
+
+  @Test
+  fun resolveTarget_danglingSymlink_returnsNull() {
+    val symlink = projectRoot.resolve(".fvm/flutter_sdk")
+    symlink.parent.createDirectories()
+    Files.createSymbolicLink(symlink, temporaryDirectory.resolve("missing"))
+
+    assertNull(locator.resolveTarget(symlink))
+  }
+
   private fun createFlutterSdkHome(version: String): Path {
     val sdkHome = temporaryDirectory.resolve("cache/versions/$version")
     sdkHome.resolve("packages/flutter").createDirectories().resolve("pubspec.yaml").createFile()
