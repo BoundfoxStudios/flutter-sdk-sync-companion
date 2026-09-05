@@ -19,8 +19,9 @@ class FlutterSdkSyncConfigurable(private val project: Project) : BoundConfigurab
   override fun createPanel(): DialogPanel = panel {
     lateinit var synchronizationEnabled: Cell<JBCheckBox>
     row {
-      synchronizationEnabled = checkBox("Keep the Flutter SDK in sync with the version manager")
+      synchronizationEnabled = checkBox("Keep the Flutter SDK in sync with FVM")
         .bindSelected(settings::synchronizationEnabled)
+        .comment("The SDK is taken from the project's .fvm directory. Other version managers are not supported.")
     }
     indent {
       row {

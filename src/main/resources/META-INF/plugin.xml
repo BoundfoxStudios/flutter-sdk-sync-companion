@@ -1,9 +1,11 @@
 <idea-plugin>
   <id>de.boundfoxstudios.flutter-sdk-sync-companion</id>
   <name>Flutter SDK Sync Companion</name>
-  <vendor url="https://boundfoxstudios.com">BoundfoxStudios</vendor>
+  <vendor url="https://boundfoxstudios.com">Boundfox Studios</vendor>
   <description><![CDATA[
-    <p>Keeps the Flutter SDK selection of a project in sync with the SDK provided by a version manager such as FVM.</p>
+    <p>Keeps the Flutter SDK selection of a project in sync with the SDK provided by FVM (Flutter Version Management).</p>
+    <p>After an <code>fvm use</code>, the IDE is pointed at the newly selected SDK and the switch is propagated: the SDK is refreshed, <code>pub get</code> runs for every pub root, and the device daemon is restarted. No IDE restart needed.</p>
+    <p>The SDK is discovered from the project's <code>.fvm</code> directory, so FVM does not have to be on the IDE's PATH. Other version managers are not supported.</p>
     <p>This plugin is not affiliated with or endorsed by Google LLC. It complements the official Flutter plugin.</p>
   ]]></description>
 
