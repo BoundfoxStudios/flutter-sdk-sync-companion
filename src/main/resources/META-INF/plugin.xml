@@ -1,0 +1,18 @@
+<idea-plugin>
+  <id>de.boundfoxstudios.flutter-sdk-sync-companion</id>
+  <name>Flutter SDK Sync Companion</name>
+  <vendor url="https://boundfoxstudios.com">BoundfoxStudios</vendor>
+  <description><![CDATA[
+    <p>Keeps the Flutter SDK selection of a project in sync with the SDK provided by a version manager such as FVM.</p>
+    <p>This plugin is not affiliated with or endorsed by Google LLC. It complements the official Flutter plugin.</p>
+  ]]></description>
+
+  <depends>com.intellij.modules.platform</depends>
+  <depends>Dart</depends>
+  <depends>io.flutter</depends>
+
+  <extensions defaultExtensionNs="com.intellij">
+    <postStartupActivity implementation="de.boundfoxstudios.fluttersdksync.startup.FlutterSdkSyncActivity"/>
+    <notificationGroup id="Flutter SDK Sync" displayType="BALLOON"/>
+  </extensions>
+</idea-plugin>
