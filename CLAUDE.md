@@ -112,13 +112,15 @@ instance keeps the `home` of whichever project was opened first. Harmless while 
 - `fvm api context` prints the entire process environment in clear text, tokens included. Never log
   its output unfiltered.
 
-## Verified by reading, not by running
+## State of verification
 
-The threading rules and the propagation chain above come from the shipped bytecode and sources, not
-from a live IDE. Two preconditions are still unconfirmed and should be checked the first time this
-runs in Android Studio: that the project directory really is a module content root (so `.fvm` is
-inside a recursive watch root and needs no `addRootToWatch`), and which VFS event shape an actual
-`fvm use` produces per OS.
+Confirmed in Android Studio on macOS: an `fvm use` on an open project is picked up, the SDK is
+switched and the pub get console opens. So `.fvm` does sit inside a recursive watch root — no
+`addRootToWatch` is needed — and the event shape the platform produces there is covered by the
+path-based matcher.
+
+Everything else — the threading rules and the rest of the propagation chain — comes from the shipped
+bytecode and sources rather than from an observed run. Unverified on Windows and Linux.
 
 Accepted breakage on a switch, until the project is reopened: the DevTools server process of the old
 SDK and any already-open DevTools tool windows.
