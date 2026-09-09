@@ -32,6 +32,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      JETBRAINS_MARKETPLACE_CERTIFICATE_CHAIN: ${{ secrets.JETBRAINS_MARKETPLACE_CERTIFICATE_CHAIN }}
+      JETBRAINS_MARKETPLACE_PRIVATE_KEY: ${{ secrets.JETBRAINS_MARKETPLACE_PRIVATE_KEY }}
+      JETBRAINS_MARKETPLACE_PRIVATE_KEY_PASSWORD: ${{ secrets.JETBRAINS_MARKETPLACE_PRIVATE_KEY_PASSWORD }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -41,10 +45,10 @@ jobs:
           distribution: temurin
           java-version: 21
       - uses: gradle/actions/setup-gradle@v6
-      - run: ./gradlew buildPlugin
+      - run: ./gradlew signPlugin
       - env:
           GITHUB_TOKEN: ${{ github.token }}
-        run: gh release upload ${{ needs.release-please.outputs.tag_name }} build/distributions/*.zip
+        run: gh release upload ${{ needs.release-please.outputs.tag_name }} build/distributions/*-signed.zip
       - env:
           JETBRAINS_MARKETPLACE_UPLOAD_TOKEN: ${{ secrets.JETBRAINS_MARKETPLACE_UPLOAD_TOKEN }}
         run: ./gradlew publishPlugin
