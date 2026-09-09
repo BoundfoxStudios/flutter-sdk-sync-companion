@@ -75,10 +75,6 @@ demands the deprecated `app-id`. Its bundled action database is stale: verified 
 `action.yml` at tag v3.2.0, `client-id` is the current input and `app-id` carries a deprecation
 message. Do not "fix" that warning.
 
-`.release-please-manifest.json` stays `{}` until the first release is merged. An entry there counts
-as an already released version, and the first release would then be a bump off it rather than the
-1.0.0 that `initial-version` asks for.
-
 ## Architecture
 
 `FlutterSdkSyncActivity` (a `postStartupActivity`) does nothing but obtain `FlutterSdkSyncService`
