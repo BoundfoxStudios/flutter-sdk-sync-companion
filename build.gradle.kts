@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.boundfoxstudios"
-version = "0.1.0" // x-release-please-version
+version = "1.0.0" // x-release-please-version
 
 repositories {
   mavenCentral()
