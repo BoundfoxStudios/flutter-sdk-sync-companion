@@ -21,7 +21,7 @@ class FlutterSdkSyncConfigurable(private val project: Project) : BoundConfigurab
     row {
       synchronizationEnabled = checkBox("Keep the Flutter SDK in sync with FVM")
         .bindSelected(settings::synchronizationEnabled)
-        .comment("The SDK is taken from the project's .fvm directory. Other version managers are not supported.")
+        .comment("The SDK is taken from the project's .fvm directory. Other version managers are not supported yet.")
     }
     indent {
       row {

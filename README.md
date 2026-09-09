@@ -29,7 +29,7 @@ It is a *companion*: it runs alongside the official plugin and only sets and pro
 - A project set up with FVM, meaning a `.fvm/flutter_sdk` symlink
 
 FVM does not have to be on the IDE's PATH. The SDK is discovered from the project's `.fvm` directory,
-so no `fvm` binary is invoked. Other version managers are not supported.
+so no `fvm` binary is invoked. Other version managers are not supported yet.
 
 ## Installation
 
