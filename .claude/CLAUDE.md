@@ -27,14 +27,27 @@ default since 2.6.0 and warns when one is set alongside `sinceBuild >= 243`.
 ## Release
 
 Releases are cut by release-please from the Conventional Commit history. A push to `main` opens or
-updates a release pull request; merging it writes `CHANGELOG.md`, tags the release, attaches the
-built plugin zip and uploads the same build to the JetBrains Marketplace via `publishPlugin`, which
-reads the repository secret `JETBRAINS_MARKETPLACE_UPLOAD_TOKEN`.
+updates a release pull request; merging it writes `CHANGELOG.md`, tags the release, signs the built
+plugin zip, attaches it to the GitHub release and uploads the same signed zip to the JetBrains
+Marketplace via `publishPlugin`, which reads the repository secret
+`JETBRAINS_MARKETPLACE_UPLOAD_TOKEN`. `publishPlugin` fails when the version was already published,
+so a re-run of a release never silently overwrites anything.
 
-The plugin is deliberately published unsigned. `signPlugin` runs automatically as soon as
-`privateKey` and `certificateChain` are configured, and adding them is all it takes to sign, but the
-Marketplace does not require it. `publishPlugin` fails when the version was already published, so a
-re-run of a release never silently overwrites anything.
+Signing reads the repository secrets `JETBRAINS_MARKETPLACE_CERTIFICATE_CHAIN` and
+`JETBRAINS_MARKETPLACE_PRIVATE_KEY` (each the PEM file as single-line Base64; a value with line
+breaks fails to decode and is used verbatim) plus `JETBRAINS_MARKETPLACE_PRIVATE_KEY_PASSWORD`.
+`publishPlugin.archiveFile` is wired to `signPlugin.signedArchiveFile` on purpose: the default picks
+the signed zip via `signPlugin.didWork`, which the configuration cache freezes to false, so the
+default published the unsigned zip (verified 2026-09-09 with IPGP 2.18.1). Open risk until the first
+signed release: in the sandbox `publishPlugin` could not parse any signed zip (`The plugin archive
+file cannot be extracted`), not even the JetBrains-signed Marketplace download of this plugin, so the
+cause is the bundled `intellij-plugin-structure`, not the key. Remove this note once a release has
+been published signed.
+
+One self-signed certificate serves every Boundfox plugin: nothing in the signature names a plugin,
+and verification matches the last certificate of the chain against a trust store. Expiry is checked
+nowhere in the chain (signer, verifier, IDE), so an expired certificate keeps working and rotation
+means reissuing the certificate for the same key and replacing the two secrets.
 
 The version lives in exactly one place, `version = ...` in `build.gradle.kts`, annotated with
 `// x-release-please-version`. Never bump it by hand: `patchPluginXml` derives the plugin version and
