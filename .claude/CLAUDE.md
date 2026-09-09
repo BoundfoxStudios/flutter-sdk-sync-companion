@@ -53,6 +53,23 @@ The version lives in exactly one place, `version = ...` in `build.gradle.kts`, a
 `// x-release-please-version`. Never bump it by hand: `patchPluginXml` derives the plugin version and
 the zip name from it, and a manual bump would collide with the one release-please writes.
 
+Marketplace change notes are the release-please changelog: `pluginConfiguration.changeNotes` renders
+the `CHANGELOG.md` section of the current version to HTML through the Gradle Changelog Plugin
+(`org.jetbrains.changelog`) and `patchPluginXml` writes it as `<change-notes>`. The Marketplace
+shows nothing else (`publishPlugin` uploads no notes, and notes cannot be edited after upload), so a
+version without a changelog section ships without notes. The wiring is explicit on purpose: the
+convention IPGP applies as soon as the changelog plugin is present falls back to `getUnreleased()`,
+release-please never writes an Unreleased section, and the build then fails while storing the
+configuration cache whenever the version has no section, as it was before the first release and is
+again after any manual version bump. Branches off main carry the notes of the last release because
+release-please bumps the version and writes the section in the same pull request.
+`getOrNull(version)?.let { }` leaves the provider empty instead, which yields no element rather than
+an empty one. `patchChangelog` is disabled because IPGP makes `publishPlugin` depend on it and it
+rewrites `CHANGELOG.md` into a shape release-please does not produce (an `## Unreleased` header, the
+compare link dropped, `*` bullets turned into `-`). The commit and issue links release-please
+appends to every entry stay in the notes: `withLinks(false)` only affects reference-style links, and
+dropping the inline ones would mean rebuilding the `Changelog.Item` with a regex.
+
 `actionlint` reports `client-id` on `actions/create-github-app-token` as an unknown input and
 demands the deprecated `app-id`. Its bundled action database is stale: verified against the
 `action.yml` at tag v3.2.0, `client-id` is the current input and `app-id` carries a deprecation
