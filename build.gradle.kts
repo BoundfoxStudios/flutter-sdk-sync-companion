@@ -1,3 +1,4 @@
+import org.jetbrains.changelog.Changelog
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.PublishPluginTask
 import org.jetbrains.intellij.platform.gradle.tasks.SignPluginTask
@@ -5,6 +6,7 @@ import org.jetbrains.intellij.platform.gradle.tasks.SignPluginTask
 plugins {
   id("org.jetbrains.kotlin.jvm") version "2.4.10"
   id("org.jetbrains.intellij.platform") version "2.18.1"
+  id("org.jetbrains.changelog") version "2.5.0"
 }
 
 group = "com.boundfoxstudios"
@@ -40,6 +42,15 @@ intellijPlatform {
     ideaVersion {
       sinceBuild = providers.gradleProperty("sinceBuild")
     }
+    val changelog = project.changelog
+    changeNotes = version.map { pluginVersion ->
+      changelog.getOrNull(pluginVersion)?.let { releaseNotes ->
+        changelog.renderItem(
+          releaseNotes.withHeader(false).withEmptySections(false),
+          Changelog.OutputType.HTML,
+        )
+      }
+    }
   }
   buildSearchableOptions = false
 }
@@ -51,4 +62,9 @@ kotlin {
 // The default wiring reads signPlugin.didWork, which the configuration cache freezes to false.
 tasks.named<PublishPluginTask>("publishPlugin") {
   archiveFile = tasks.named<SignPluginTask>("signPlugin").flatMap { it.signedArchiveFile }
+}
+
+// IPGP makes publishPlugin depend on patchChangelog, which rewrites the release-please changelog.
+tasks.named("patchChangelog") {
+  enabled = false
 }
